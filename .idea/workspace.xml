@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5d2a8aa8-7c7f-44a9-a0d3-826503a74019" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/controller/ProductController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/dao/ProductDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/dao/ProductRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/dao/impl/ProductDaoImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/model/Product.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/rowmapper/ProductRowMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/service/ProductService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/service/impl/ProductServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/springboot-mall.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/springboot-mall.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springboot-mall/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/springboot-mall/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/SpringbootMallApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/SpringbootMallApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springboot-mall/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/springboot-mall/src/main/resources/application.properties" afterDir="false" />
-    </list>
+    <list default="true" id="5d2a8aa8-7c7f-44a9-a0d3-826503a74019" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -130,7 +115,7 @@
       <workItem from="1771207430617" duration="189000" />
       <workItem from="1781517025213" duration="3407000" />
       <workItem from="1781523998217" duration="1449000" />
-      <workItem from="1781604584061" duration="3932000" />
+      <workItem from="1781604584061" duration="4532000" />
     </task>
     <servers />
   </component>
