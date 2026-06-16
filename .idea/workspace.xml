@@ -4,22 +4,62 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5d2a8aa8-7c7f-44a9-a0d3-826503a74019" name="Changes" comment="" />
+    <list default="true" id="5d2a8aa8-7c7f-44a9-a0d3-826503a74019" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/controller/ProductController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/dao/ProductDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/dao/ProductRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/dao/impl/ProductDaoImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/model/Product.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/rowmapper/ProductRowMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/service/ProductService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/service/impl/ProductServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/springboot-mall.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/springboot-mall.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springboot-mall/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/springboot-mall/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/SpringbootMallApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/springboot-mall/src/main/java/com/jay/springbootmall/SpringbootMallApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springboot-mall/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/springboot-mall/src/main/resources/application.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;02-JAY&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/02-JAY/springboot-mall.git&quot;,
+    &quot;accountId&quot;: &quot;8481e746-73f9-4591-b0e9-acc64198e2d0&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/springboot-mall/pom.xml" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="39CeFYvLadoHFoIAN0fZZyTvdLG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -28,24 +68,49 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.SpringbootMallApplication.executor": "Debug",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "product-crud",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/intellij/springboot-mall",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "MavenSettings",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "TEXT"
+    ]
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="SpringbootMallApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="springboot-mall" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jay.springbootmall.SpringbootMallApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -62,10 +127,25 @@
       <option name="presentableId" value="Default" />
       <updated>1770204376605</updated>
       <workItem from="1770204377868" duration="557000" />
+      <workItem from="1771207430617" duration="189000" />
+      <workItem from="1781517025213" duration="3407000" />
+      <workItem from="1781523998217" duration="1449000" />
+      <workItem from="1781604584061" duration="3932000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
