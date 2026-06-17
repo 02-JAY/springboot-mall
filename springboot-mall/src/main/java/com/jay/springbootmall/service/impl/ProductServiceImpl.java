@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -21,10 +23,21 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public Product createProduct(Product product) {
-        // 呼叫 JPA 的 save() 方法，它會自動發送 INSERT INTO product ...
+        // 呼叫 JPA 的 save() 方法，會自動 INSERT INTO product ...
         // 並且會自動處理 version 欄位初始化，同時將資料庫自增生成的 product_id 回填到物件中
         return productRepository.save(product);
     }
+
+    @Override
+    public List<Product> getProductsByCategory(String category) {
+        return productRepository.findByCategory(category);
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
     @Override
     public Product getProductById(Integer productId) {
 
