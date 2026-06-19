@@ -51,6 +51,9 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Integer isDeleted = 0; // 0: 未刪除, 1: 已刪除
+
     @CreatedDate // 建立時自動填入時間
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
@@ -145,6 +148,14 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public LocalDateTime getCreatedDate() {

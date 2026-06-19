@@ -20,14 +20,15 @@ public class ProductRowMapper implements RowMapper<Product> {
 
         product.setProductId(rs.getInt("product_id"));
         product.setProductName(rs.getString("product_name"));
-        product.setBrand(rs.getString("brand")); // 新增
+        product.setBrand(rs.getString("brand"));
         product.setCategory(rs.getString("category"));
         product.setPrice(rs.getInt("price"));
         product.setStock(rs.getInt("stock"));
-        product.setVersion(rs.getInt("version")); // 新增
-        product.setIsPromo(rs.getBoolean("is_promo")); // 新增
+        product.setVersion(rs.getInt("version"));
+        product.setIsPromo(rs.getBoolean("is_promo"));
         product.setImageUrl(rs.getString("image_url"));
         product.setDescription(rs.getString("description"));
+        product.setIsDeleted(rs.getInt("is_deleted"));
         product.setCreatedDate(rs.getTimestamp("created_date").toLocalDateTime());
         product.setLastModifiedDate(rs.getTimestamp("last_modified_date").toLocalDateTime());
 

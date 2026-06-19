@@ -14,20 +14,17 @@ import java.util.List;
 @Tag(name = "商品相關 API", description = "提供商品查詢、新增等電商核心功能")
 @RestController
 @RequestMapping("/api/v1/products") // 1. 統一管理基本路徑與版本
-public class ProductController {
+public class ProductClientController {
     @Autowired
     private ProductService productService;
 
     @Operation(summary = "取得單一商品詳情", description = "根據商品 ID 查詢商品詳細資訊，若找不到則回傳 404")
     @GetMapping("/{productId}") // 這裡會自動拼接成 /api/v1/products/{productId}
-    public ResponseEntity<Product> getProduct(@PathVariable Integer productId){
-            Product product = productService.getProductById(productId);
+    public ResponseEntity<Product> getProduct(@PathVariable Integer productId) {
+        Product product = productService.getProductById(productId);
 
-            if(product!=null){
-                return ResponseEntity.status(HttpStatus.OK).body(product);
-            }else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
+
+        return ResponseEntity.status(HttpStatus.OK).body(product);
 
     }
 
@@ -49,10 +46,4 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }
 
-    @Operation(summary = "建立新商品", description = "後台管理人員或初始化資料時使用")
-    @PostMapping // 這裡會自動拼接成 /api/v1/products
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product savedProduct = productService.createProduct(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
-    }
 }

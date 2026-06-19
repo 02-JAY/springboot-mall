@@ -4,7 +4,6 @@ import com.jay.springbootmall.dao.ProductDao;
 import com.jay.springbootmall.model.Product;
 import com.jay.springbootmall.rowmapper.ProductRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -22,9 +21,8 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product getProductById(Integer productId) {
-        // 補齊這次設計的所有欄位：brand, version, is_promo, product_spec
         String sql = "SELECT product_id, product_name, brand, category, price, stock, " +
-                "version, is_promo, product_spec, image_url, description, " +
+                "version, is_promo, product_spec, image_url, description, is_deleted, " + // <-- 補在這裡
                 "created_date, last_modified_date " +
                 "FROM product " +
                 "WHERE product_id = :productId";
