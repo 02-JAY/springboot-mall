@@ -63,4 +63,11 @@ public interface ProductService {
     List<Product> getProducts(String search, String category, Integer minPrice, Integer maxPrice,
                               Boolean isPromotion, Integer page, Integer size, String orderBy, String sort);
 
+
+    /**
+     * LINE Bot 專用：依據精煉後的關鍵字與分類進行智慧推薦
+     */
+    List<Product> getBotRecommendations(String keyword, String category);
+
+
 }

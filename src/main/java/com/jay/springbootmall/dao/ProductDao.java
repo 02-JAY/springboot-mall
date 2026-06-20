@@ -9,4 +9,6 @@ public interface ProductDao {
     List<Product> getProducts(String search, String category, Integer minPrice, Integer maxPrice,
                               Boolean isPromotion, Integer page, Integer size, String orderBy, String sort);
 
+
+    List<Product> getBotRecommendations(String keyword, String category);
 }

@@ -135,4 +135,17 @@ public class ProductServiceImpl implements ProductService {
 
         return productDao.getProducts(search, category, minPrice, maxPrice, isPromotion, page, size, orderBy, sort);
     }
+
+    /**
+     * LINE Bot 專用：依據精煉後的關鍵字與分類進行智慧推薦
+     */
+    @Override
+    public List<Product> getBotRecommendations(String keyword, String category) {
+        // 為了容錯，如果兩者都沒傳，就給個空字串避免噴錯
+        String validKeyword = (keyword != null) ? keyword.trim() : "";
+        String validCategory = (category != null) ? category.trim() : "";
+
+        // 業務邏輯：直接交給 DAO 進行多維度 SQL 檢索
+        return productDao.getBotRecommendations(validKeyword, validCategory);
+    }
 }

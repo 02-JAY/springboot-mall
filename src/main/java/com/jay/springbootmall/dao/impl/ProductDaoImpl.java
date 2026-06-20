@@ -13,10 +13,15 @@ import java.util.Map;
 
 @Repository
 public class ProductDaoImpl implements ProductDao {
+    // 1. 將所有依賴都宣告為 private final（不可變，更安全）
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
+    private final ProductRowMapper productRowMapper;
 
-    public ProductDaoImpl(NamedParameterJdbcOperations namedParameterJdbcOperations) {
+    // 2. 統一用同一個建構子注入！連 @Autowired 都不用寫，Spring 會自動幫你把這兩個 Bean 塞進來
+    public ProductDaoImpl(NamedParameterJdbcOperations namedParameterJdbcOperations,
+                          ProductRowMapper productRowMapper) {
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
+        this.productRowMapper = productRowMapper;
     }
 
     @Override
@@ -84,6 +89,48 @@ public class ProductDaoImpl implements ProductDao {
         map.put("offset", page * size); // 第一頁 page=0, offset=0; 第二頁 page=1, offset=10
 
         // 5. 執行查詢
-        return namedParameterJdbcOperations.query(sql.toString(), map, new ProductRowMapper());
+        return namedParameterJdbcOperations.query(sql.toString(), map, productRowMapper);
     }
+
+    @Override
+    public List<Product> getBotRecommendations(String keyword, String category) {
+        // 基礎 SQL：確保撈出所有必要欄位，且商品必須是「未刪除」的正常商品
+        StringBuilder sql = new StringBuilder(
+                "SELECT product_id, product_name, brand, category, price, stock, " +
+                        "version, is_promo, product_spec, image_url, description, is_deleted, " +
+                        "created_date, last_modified_date " +
+                        "FROM product " +
+                        "WHERE is_deleted = 0 "
+        );
+
+        Map<String, Object> map = new HashMap<>();
+
+        // 🌟 動態條件拼接
+        // 1. 如果 AI 有成功預測出精準的分類，直接鎖定分類查詢
+        if (category != null && !category.trim().isEmpty()) {
+            sql.append("AND category = :category ");
+            map.put("category", category.trim());
+        }
+
+        // 2. 如果有核心關鍵字，進行多維度（品名、描述、JSON規格）模糊比對
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND ( ")
+                    .append("    product_name LIKE :keyword ")
+                    .append("    OR description LIKE :keyword ")
+                    .append("    OR LOWER(product_spec) LIKE :keyword ")
+                    .append(") ");
+            map.put("keyword", "%" + keyword.trim().toLowerCase() + "%");
+        }
+
+        // 商業推薦權重：優先推薦正在促銷（is_promo=1）的商品，其次才是最新上架的
+        sql.append("ORDER BY is_promo DESC, created_date DESC ");
+
+        // 限制只拿 3 筆，完美符合 LINE Carousel 視窗版面限制限制
+        sql.append("LIMIT 1");
+
+        // 執行查詢並丟給你的 RowMapper 自動解析
+        return namedParameterJdbcOperations.query(sql.toString(), map, productRowMapper);
+    }
+
+
 }
