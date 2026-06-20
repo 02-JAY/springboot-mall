@@ -3,6 +3,7 @@ package com.jay.springbootmall.controller;
 import com.jay.springbootmall.model.Product;
 import com.jay.springbootmall.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,22 +29,45 @@ public class ProductClientController {
 
     }
 
-    @Operation(summary = "取得商品列表", description = "可帶入 category 參數篩選特定分類的商品（如心理測驗專用的 FRAGRANCE_PACK）")
+    @Operation(summary = "多功能條件搜尋商品", description = "支援關鍵字模糊查詢、分類篩選、價格區間篩選。不傳的條件代表不限制。")
     @GetMapping
     public ResponseEntity<List<Product>> getProducts(
-            @RequestParam(required = false) String category) {
+            @Parameter(description = "關鍵字模糊查詢（商品名稱或品牌）", example = "消臭包")
+            @RequestParam(required = false) String search,
 
-        List<Product> productList;
+            @Parameter(description = "分類篩選", example = "FRAGRANCE_PACK")
+            @RequestParam(required = false) String category,
 
-        if (category != null) {
-            // 如果有傳分類，就走分類查詢
-            productList = productService.getProductsByCategory(category);
-        } else {
-            // 如果沒傳，就撈出全部商品（原本的 JPA 內建功能）
-            productList = productService.getAllProducts();
-        }
+            @Parameter(description = "最低價格", example = "50")
+            @RequestParam(required = false) Integer minPrice,
 
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+            @Parameter(description = "最高價格", example = "300")
+            @RequestParam(required = false) Integer maxPrice,
+
+            @Parameter(description = "是否只篩選特價/優惠商品", example = "true")
+            @RequestParam(required = false) Boolean isPromotion,
+
+            // 新增：JDBC 分頁與排序參數（設定預設值）
+            @Parameter(description = "分頁頁碼（從 0 開始）", example = "0")
+            @RequestParam(defaultValue = "0") Integer page,
+
+            @Parameter(description = "每頁筆數", example = "10")
+            @RequestParam(defaultValue = "10") Integer size,
+
+            @Parameter(description = "排序欄位", example = "created_date")
+            @RequestParam(defaultValue = "created_date") String orderBy,
+
+            @Parameter(description = "排序方向", example = "desc")
+            @RequestParam(defaultValue = "desc") String sort
+    ) {
+        // Service 層除了處理搜尋，還要負責：
+        // 1. 自動加上 WHERE deleted_at IS NULL (軟刪除過濾，前台不顯示已刪除商品)
+        // 2. 處理分頁 (LIMIT = size, OFFSET = page * size)
+        List<Product> products = productService.getProducts(
+                search, category, minPrice, maxPrice, isPromotion, page, size, orderBy, sort
+        );
+
+        return ResponseEntity.ok(products);
     }
 
 }
