@@ -37,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
      * 後台：修改商品商務資訊 (導入 DTO 與樂觀鎖控制)
      */
     @Override
+    @Transactional
     public Product updateProduct(Integer productId, UpdateProductDTO updateProductDTO) {
         // 1. 先從資料庫查出帶有樂觀鎖版本（version）與建立時間的完整舊物件
         // 這裡必須用 productRepository (JPA) 查，才能讓這筆物件進入 JPA 的管理狀態，save 時才會動態比對 version 觸發樂觀鎖！
@@ -79,17 +80,40 @@ public class ProductServiceImpl implements ProductService {
      * 後台：下架商品（軟刪除）
      */
     @Override
+    @Transactional
     public void deleteProductById(Integer productId) {
         // 1. 檢查商品是否存在
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("刪除失敗：找不到該商品，ID: " + productId));
 
-        // 2. 核心精髓：不執行實體刪除，而是把狀態改為 1
+        // 2. 不執行實體刪除，而是把狀態改為 1
         product.setIsDeleted(1);
 
-        // 3. 存回資料庫，這樣該商品在資料庫的 is_deleted 欄位就會變成 1
+        // 3. 存回資料庫，這樣該商品在資料庫的 is_deleted 欄位就會變成 1,且樂觀鎖 version 會自動 +1
         productRepository.save(product);
     }
+
+    /**
+     * 後台：恢復已軟刪除的商品（軟刪除）
+     */
+    @Override
+    @Transactional
+    public void restoreProductById(Integer productId) {
+        // 1. 1. 檢查商品是否存在
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("恢復失敗：找不到該商品，ID: " + productId));
+
+        // 2. 檢查是否刪除？
+        if (product.getIsDeleted() == 0) {
+            throw new RuntimeException("該商品目前處於正常上架狀態，不需恢復。");
+        }
+
+        // 3. 改回 0，JPA 會在 Transaction 結束時自動寫回資料庫，且樂觀鎖 version 會自動 +1
+        product.setIsDeleted(0);
+        productRepository.save(product);
+    }
+
+
 
     // 區塊 B：前台購物網站與外部檢索 (Client Portal / LINE Bot API)
 

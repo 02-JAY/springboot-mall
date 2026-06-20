@@ -36,4 +36,11 @@ public class ProductAdminController {
         productService.deleteProductById(productId);
         return ResponseEntity.noContent().build(); // 回傳 204 No Content
     }
+
+    @Operation(summary = "恢復已軟刪除的商品", description = "將商品的 is_deleted 狀態改回 0，使其重新出現在前台商城。")
+    @PatchMapping("/{productId}/restore")
+    public ResponseEntity<Void> restoreProduct(@PathVariable Integer productId) {
+        productService.restoreProductById(productId);
+        return ResponseEntity.ok().build(); // 回傳 200 OK
+    }
 }

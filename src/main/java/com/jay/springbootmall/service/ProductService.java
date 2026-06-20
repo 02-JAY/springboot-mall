@@ -33,6 +33,12 @@ public interface ProductService {
      */
     void deleteProductById(Integer productId);
 
+    /**
+     * 後台：恢復已軟刪除的商品（軟刪除）
+     * @param productId 要上架的商品 ID
+     */
+    void restoreProductById(Integer productId);
+
 
     // ========================================================================
     // 🛒 區塊 B：前台購物網站與外部檢索 (Client Portal / LINE Bot API)
