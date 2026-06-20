@@ -8,7 +8,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Map;
 
 @Entity
@@ -26,8 +25,10 @@ public class Product {
     @Column(nullable = false)
     private String brand;
 
+    // 改成 Enum 型態
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String category;
+    private ProductCategory category;
 
     @Column(nullable = false)
     private Integer price;
@@ -86,11 +87,11 @@ public class Product {
         this.brand = brand;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 

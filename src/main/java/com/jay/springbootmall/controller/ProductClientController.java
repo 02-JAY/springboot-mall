@@ -1,6 +1,7 @@
 package com.jay.springbootmall.controller;
 
 import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.model.ProductCategory;
 import com.jay.springbootmall.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "商品相關 API", description = "提供商品查詢、新增等電商核心功能")
 @RestController
@@ -36,7 +40,7 @@ public class ProductClientController {
             @RequestParam(required = false) String search,
 
             @Parameter(description = "分類篩選", example = "FRAGRANCE_PACK")
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) ProductCategory category,
 
             @Parameter(description = "最低價格", example = "50")
             @RequestParam(required = false) Integer minPrice,
@@ -68,6 +72,19 @@ public class ProductClientController {
         );
 
         return ResponseEntity.ok(products);
+    }
+
+    @Operation(summary = "獲取所有商品分類清單", description = "提供給 LINE Bot 或網頁前台動態渲染選單按鈕使用。")
+    @GetMapping("/categories") // 👈 路由會變成 /api/v1/products/categories
+    public ResponseEntity<List<Map<String, String>>> getCategories() {
+        List<Map<String, String>> categoryList = new ArrayList<>();
+        for (ProductCategory category : ProductCategory.values()) {
+            Map<String, String> map = new HashMap<>();
+            map.put("code", category.name());
+            map.put("name", category.getDisplayName());
+            categoryList.add(map);
+        }
+        return ResponseEntity.ok(categoryList);
     }
 
 }

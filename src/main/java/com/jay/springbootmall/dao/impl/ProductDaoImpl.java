@@ -2,6 +2,7 @@ package com.jay.springbootmall.dao.impl;
 
 import com.jay.springbootmall.dao.ProductDao;
 import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.model.ProductCategory;
 import com.jay.springbootmall.rowmapper.ProductRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,7 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> getProducts(String search, String category, Integer minPrice, Integer maxPrice,
+    public List<Product> getProducts(String search, ProductCategory category, Integer minPrice, Integer maxPrice,
                                      Boolean isPromotion, Integer page, Integer size, String orderBy, String sort) {
 
         StringBuilder sql = new StringBuilder(
@@ -47,9 +48,14 @@ public class ProductDaoImpl implements ProductDao {
             map.put("search", "%" + search + "%");
         }
 
-        if (category != null && !category.trim().isEmpty()) {
+//        if (category != null && !category.trim().isEmpty()) {
+//            sql.append("AND category = :category ");
+//            map.put("category", category);
+//        }
+        // 修改條件：因為變成 Enum，只要判斷是否為 null
+        if (category != null) {
             sql.append("AND category = :category ");
-            map.put("category", category);
+            map.put("category", category.name()); // 用 .name() 轉成字串（如 "FRAGRANCE_PACK"）
         }
 
         if (minPrice != null) {

@@ -3,6 +3,7 @@ package com.jay.springbootmall.service.impl;
 import com.jay.springbootmall.dao.ProductDao;
 import com.jay.springbootmall.dao.ProductRepository;
 import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.model.ProductCategory;
 import com.jay.springbootmall.model.UpdateProductDTO;
 import com.jay.springbootmall.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -130,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
      * 高階動態搜尋：支援多欄位模糊比對、分類過濾、價格區間篩選（走 JDBC 動態 SQL）
      */
     @Override
-    public List<Product> getProducts(String search, String category, Integer minPrice, Integer maxPrice,
+    public List<Product> getProducts(String search, ProductCategory category, Integer minPrice, Integer maxPrice,
                                      Boolean isPromotion, Integer page, Integer size, String orderBy, String sort) {
 
         return productDao.getProducts(search, category, minPrice, maxPrice, isPromotion, page, size, orderBy, sort);

@@ -3,6 +3,7 @@ package com.jay.springbootmall.rowmapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.model.ProductCategory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,12 @@ public class ProductRowMapper implements RowMapper<Product> {
         product.setProductId(rs.getInt("product_id"));
         product.setProductName(rs.getString("product_name"));
         product.setBrand(rs.getString("brand"));
-        product.setCategory(rs.getString("category"));
+        //product.setCategory(rs.getString("category"));
+        // 將資料庫字串轉為 Java Enum
+        String categoryStr = rs.getString("category");
+        if (categoryStr != null) {
+            product.setCategory(ProductCategory.valueOf(categoryStr));
+        }
         product.setPrice(rs.getInt("price"));
         product.setStock(rs.getInt("stock"));
         product.setVersion(rs.getInt("version"));

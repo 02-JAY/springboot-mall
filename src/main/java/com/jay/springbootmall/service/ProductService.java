@@ -1,6 +1,7 @@
 package com.jay.springbootmall.service;
 
 import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.model.ProductCategory;
 import com.jay.springbootmall.model.UpdateProductDTO;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public interface ProductService {
      * @param maxPrice 最高價格限制限制
      * @return 符合動態篩選條件的商品清單
      */
-    List<Product> getProducts(String search, String category, Integer minPrice, Integer maxPrice,
+    List<Product> getProducts(String search, ProductCategory category, Integer minPrice, Integer maxPrice,
                               Boolean isPromotion, Integer page, Integer size, String orderBy, String sort);
 
 

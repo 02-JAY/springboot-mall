@@ -9,17 +9,18 @@ import java.util.Map;
 @Schema(description = "修改商品請求參數")
 public class UpdateProductDTO {
 
-    @Schema(description = "商品名稱", example = "極致高蛋白乳清")
+    @Schema(description = "商品名稱", example = " 香氛防潮袋")
     @NotBlank(message = "商品名稱不能為空")
     private String productName;
 
-    @Schema(description = "品牌", example = "MyProtein")
+    @Schema(description = "品牌", example = "山水")
     @NotBlank(message = "品牌不能為空")
     private String brand;
 
-    @Schema(description = "商品分類", example = "健身食品")
-    @NotBlank(message = "商品分類不能為空")
-    private String category;
+    // 改成 Enum 型態，調整 Swagger 範例，並改用 @NotNull 驗證
+    @Schema(description = "商品分類", example = "FRAGRANCE_PACK")
+    @NotNull(message = "商品分類不能為 null") //  Enum 驗證要用 @NotNull
+    private ProductCategory category;
 
     @Schema(description = "價格", example = "899")
     @NotNull(message = "價格不能為 null")
@@ -35,7 +36,7 @@ public class UpdateProductDTO {
     @NotNull(message = "是否促銷狀態不能為 null")
     private Boolean isPromo;
 
-    @Schema(description = "商品規格 (JSON 格式)", example = "{\"flavor\": \"巧克力\", \"weight\": \"1kg\"}")
+    @Schema(description = "商品規格 (JSON 格式)", example = "{\"type\": \"草本舒緩\", \"flavor\": \"南法薰衣草\", \"weight\": \"100g\", \"color\": \"purple\"}")
     @NotNull(message = "商品規格不能為 null")
     private Map<String, Object> productSpec;
 
@@ -43,7 +44,7 @@ public class UpdateProductDTO {
     @NotBlank(message = "商品圖片網址不能為空")
     private String imageUrl;
 
-    @Schema(description = "商品描述說明", example = "這是一款高純度的分離乳清蛋白...")
+    @Schema(description = "商品描述說明", example = "股帶有微酸、能瞬間提振精神的清爽爆發力")
     private String description; // 描述允許為空，所以不加 @NotBlank
 
     public String getProductName() {
@@ -62,11 +63,11 @@ public class UpdateProductDTO {
         this.brand = brand;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 
