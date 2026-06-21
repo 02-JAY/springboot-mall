@@ -27,6 +27,14 @@ public class ProductAdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
+    @Operation(summary = "後台：取得單一商品詳情（含已下架）",
+            description = "管理員專用。根據商品 ID 查詢商品完整資訊，包含已下架（軟刪除）的商品皆可查得。")
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getProductByIdForAdmin(@PathVariable Integer productId) {
+        Product product = productService.getProductByIdForAdmin(productId);
+        return ResponseEntity.status(HttpStatus.OK).body(product);
+    }
+
     @PutMapping("/{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
                                                  @Valid @RequestBody ProductRequestDTO productRequestDTO) {

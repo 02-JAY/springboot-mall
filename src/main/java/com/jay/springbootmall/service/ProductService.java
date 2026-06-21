@@ -21,6 +21,11 @@ public interface ProductService {
     Product createProduct(ProductRequestDTO productRequestDTO);
 
     /**
+     * 後台（Admin）：依 ID 查詢單一商品（無論上下架都能查到）
+     */
+    Product getProductByIdForAdmin(Integer productId);
+
+    /**
      * 後台：獲取所有商品列表（含上下架狀況）
      * * @param isDeleted 過濾刪除狀態：0 代表未刪除（上架中），1 代表已刪除（下架），傳 null 則不限制
      * @param page      分頁頁碼（從 0 開始）
@@ -60,7 +65,8 @@ public interface ProductService {
      * @param productId 商品識別碼
      * @return 商品實體物件
      */
-    Product getProductById(Integer productId);
+    //Product getProductById(Integer productId);
+    Product getProductByIdForClient(Integer productId);
 
     /**
      * 高階動態搜尋：支援多欄位模糊比對、分類過濾、價格區間篩選（走 JDBC 動態 SQL）

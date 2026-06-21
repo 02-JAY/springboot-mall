@@ -23,10 +23,11 @@ public class ProductClientController {
     @Autowired
     private ProductService productService;
 
-    @Operation(summary = "取得單一商品詳情", description = "根據商品 ID 查詢商品詳細資訊，若找不到則回傳 404")
+    @Operation(summary = "取得單一商品詳情（僅限上架）",
+            description = "根據商品 ID 查詢正常上架的商品資訊。若商品不存在或已下架（軟刪除），則會回傳錯誤。")
     @GetMapping("/{productId}") // 這裡會自動拼接成 /api/v1/products/{productId}
-    public ResponseEntity<Product> getProduct(@PathVariable Integer productId) {
-        Product product = productService.getProductById(productId);
+    public ResponseEntity<Product> getProductByIdForClient(@PathVariable Integer productId) {
+        Product product = productService.getProductByIdForClient(productId);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(product);

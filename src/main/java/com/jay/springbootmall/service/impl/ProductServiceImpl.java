@@ -98,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
             // 如果前端傳入 null，代表要把所有規格清空（視你的業務需求而定，也可以選擇不處理）
             existingProduct.setProductSpec(new HashMap<>());
         }
-        
+
         // 4.將更新後的舊物件存回，這時樂觀鎖會完美觸發，防範同時修改的衝突
         return productRepository.save(existingProduct);
     }
@@ -140,17 +140,25 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-
+    /**
+     * 後台（Admin）：依 ID 查詢單一商品（無論上下架都能查到）
+     */
+    @Override
+    public Product getProductByIdForAdmin(Integer productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("後台查詢失敗：找不到該商品，ID: " + productId));
+    }
 
     // 區塊 B：前台購物網站與外部檢索 (Client Portal / LINE Bot API)
 
     /**
-     * 常規查詢：依據 ID 獲取單筆商品完整詳情（走 JPA）
+     * 前台（Client）：依 ID 查詢「僅限上架」的商品
      */
     @Override
-    public Product getProductById(Integer productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("查詢失敗：找不到該商品，ID: " + productId));
+    public Product getProductByIdForClient(Integer productId) {
+        // 傳入 0 代表 is_deleted = 0 (未刪除/上架中)
+        return productRepository.findByProductIdAndIsDeleted(productId, 0)
+                .orElseThrow(() -> new RuntimeException("商品已下架或不存在，ID: " + productId));
     }
 
     /**
