@@ -2,7 +2,7 @@ package com.jay.springbootmall.service;
 
 import com.jay.springbootmall.model.Product;
 import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.model.UpdateProductDTO;
+import com.jay.springbootmall.model.ProductRequestDTO;
 
 import java.util.List;
 
@@ -18,7 +18,16 @@ public interface ProductService {
      * @param product 完整的商品實體
      * @return 建立成功並回填 ID 的商品物件
      */
-    Product createProduct(Product product);
+    Product createProduct(ProductRequestDTO productRequestDTO);
+
+    /**
+     * 後台：獲取所有商品列表（含上下架狀況）
+     * * @param isDeleted 過濾刪除狀態：0 代表未刪除（上架中），1 代表已刪除（下架），傳 null 則不限制
+     * @param page      分頁頁碼（從 0 開始）
+     * @param size      每頁顯示的商品筆數
+     * @return 包含分頁商品資料的列表集合
+     */
+    List<Product> getAllProductsForAdmin(Integer isDeleted, Integer page, Integer size);
 
     /**
      * 後台：修改商品商務資訊
@@ -26,7 +35,7 @@ public interface ProductService {
      * @param updateProductDTO 允許被前端覆蓋的修改欄位資料
      * @return 更新成功且樂觀鎖版本（version）遞增後的商品物件
      */
-    Product updateProduct(Integer productId, UpdateProductDTO updateProductDTO);
+    Product updateProduct(Integer productId, ProductRequestDTO productRequestDTO);
 
     /**
      * 後台：下架商品（軟刪除）

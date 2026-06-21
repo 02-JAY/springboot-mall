@@ -12,4 +12,6 @@ public interface ProductDao {
 
 
     List<Product> getBotRecommendations(String keyword, String category);
+
+    List<Product> getAllProductsForAdmin(Integer isDeleted, Integer page, Integer size);
 }

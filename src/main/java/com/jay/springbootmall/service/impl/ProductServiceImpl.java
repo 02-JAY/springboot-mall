@@ -4,7 +4,7 @@ import com.jay.springbootmall.dao.ProductDao;
 import com.jay.springbootmall.dao.ProductRepository;
 import com.jay.springbootmall.model.Product;
 import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.model.UpdateProductDTO;
+import com.jay.springbootmall.model.ProductRequestDTO;
 import com.jay.springbootmall.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,39 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
-    public Product createProduct(Product product) {
+    public Product createProduct(ProductRequestDTO productRequestDTO) {
+        // 1. 建立一個全新的 Product 實體
+        Product product = new Product();
+
+        // 2. 將 DTO 的欄位一個一個塞進去
+        product.setProductName(productRequestDTO.getProductName());
+        product.setBrand(productRequestDTO.getBrand());
+        product.setCategory(productRequestDTO.getCategory());
+        product.setPrice(productRequestDTO.getPrice());
+        product.setStock(productRequestDTO.getStock());
+        product.setIsPromo(productRequestDTO.getIsPromo());
+        product.setProductSpec(productRequestDTO.getProductSpec());
+        product.setImageUrl(productRequestDTO.getImageUrl());
+        product.setDescription(productRequestDTO.getDescription());
+
+        // productId, version, createdDate, isDeleted
+        // 都不用手動設定，JPA 與資料庫會自動處理！
+
+        // 3. 呼叫 repository 存入真正的實體
         return productRepository.save(product);
+    }
+
+    /**
+     * 後台：獲取所有商品列表（含上下架狀況）
+     * * @param isDeleted 過濾刪除狀態：0 代表未刪除（上架中），1 代表已刪除（下架），傳 null 則不限制
+     * @param page      分頁頁碼（從 0 開始）
+     * @param size      每頁顯示的商品筆數
+     * @return 包含分頁商品資料的列表集合
+     */
+    @Override
+    public List<Product> getAllProductsForAdmin(Integer isDeleted, Integer page, Integer size) {
+        // 商業邏輯：直接交給負責複雜查詢的 productDao
+        return productDao.getAllProductsForAdmin(isDeleted, page, size);
     }
 
     /**
@@ -39,40 +70,35 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     @Transactional
-    public Product updateProduct(Integer productId, UpdateProductDTO updateProductDTO) {
+    public Product updateProduct(Integer productId, ProductRequestDTO productRequestDTO) {
         // 1. 先從資料庫查出帶有樂觀鎖版本（version）與建立時間的完整舊物件
         // 這裡必須用 productRepository (JPA) 查，才能讓這筆物件進入 JPA 的管理狀態，save 時才會動態比對 version 觸發樂觀鎖！
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("修改失敗：找不到該商品，ID: " + productId));
 
         // 2. 僅覆蓋「允許被修改」的欄位，防止重要安全參數被前端惡意覆蓋
-        existingProduct.setProductName(updateProductDTO.getProductName());
-        existingProduct.setBrand(updateProductDTO.getBrand());
-        existingProduct.setCategory(updateProductDTO.getCategory());
-        existingProduct.setPrice(updateProductDTO.getPrice());
-        existingProduct.setStock(updateProductDTO.getStock());
-        existingProduct.setIsPromo(updateProductDTO.getIsPromo());
+        existingProduct.setProductName(productRequestDTO.getProductName());
+        existingProduct.setBrand(productRequestDTO.getBrand());
+        existingProduct.setCategory(productRequestDTO.getCategory());
+        existingProduct.setPrice(productRequestDTO.getPrice());
+        existingProduct.setStock(productRequestDTO.getStock());
+        existingProduct.setIsPromo(productRequestDTO.getIsPromo());
         //existingProduct.setProductSpec(updateProductDTO.getProductSpec());
-        existingProduct.setImageUrl(updateProductDTO.getImageUrl());
-        existingProduct.setDescription(updateProductDTO.getDescription());
+        existingProduct.setImageUrl(productRequestDTO.getImageUrl());
+        existingProduct.setDescription(productRequestDTO.getDescription());
 
         // 備註：
         // 1. 不要去 setVersion，JPA 在 save() 時發現版本對齊，會自動幫你將資料庫的 version + 1。
         // 2. 不要去 setIsDeleted，商品的上架/下架狀態由專門的 DELETE API（軟刪除）控制，這裡不允許隨便被前端覆蓋。
 
-
-        // 3.  精細處理 JSON 規格欄位 (Map 合併邏輯)
-        if (updateProductDTO.getProductSpec() != null) {
-            // 如果舊商品原本沒有任何規格，先幫他初始化一個 Map
-            if (existingProduct.getProductSpec() == null) {
-                existingProduct.setProductSpec(new HashMap<>());
-            }
-
-            // 增量合併：把前端送來的新規格，塞進舊有的 Map 裡（原本有的會覆蓋，原本有但前端沒傳的會被保留！）
-            existingProduct.getProductSpec().putAll(updateProductDTO.getProductSpec());
+        // 3. 處理 JSON 規格欄位 (改為完全覆蓋，以便支援前端的「減量/刪除 Key」操作)
+        if (productRequestDTO.getProductSpec() != null) {
+            existingProduct.setProductSpec(productRequestDTO.getProductSpec());
+        } else {
+            // 如果前端傳入 null，代表要把所有規格清空（視你的業務需求而定，也可以選擇不處理）
+            existingProduct.setProductSpec(new HashMap<>());
         }
-
-
+        
         // 4.將更新後的舊物件存回，這時樂觀鎖會完美觸發，防範同時修改的衝突
         return productRepository.save(existingProduct);
     }

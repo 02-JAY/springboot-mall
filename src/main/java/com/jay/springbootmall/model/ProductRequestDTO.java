@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
 @Schema(description = "修改商品請求參數")
-public class UpdateProductDTO {
+public class ProductRequestDTO {
 
     @Schema(description = "商品名稱", example = " 香氛防潮袋")
     @NotBlank(message = "商品名稱不能為空")

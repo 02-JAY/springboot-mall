@@ -138,5 +138,35 @@ public class ProductDaoImpl implements ProductDao {
         return namedParameterJdbcOperations.query(sql.toString(), map, productRowMapper);
     }
 
+    @Override
+    public List<Product> getAllProductsForAdmin(Integer isDeleted, Integer page, Integer size) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT product_id, product_name, brand, category, price, stock, " +
+                        "version, is_promo, product_spec, image_url, description, is_deleted, " +
+                        "created_date, last_modified_date " +
+                        "FROM product " +
+                        "WHERE 1=1 " // 方便後續動態拼接 AND
+        );
+
+        Map<String, Object> map = new HashMap<>();
+
+        // 核心動態判斷：
+        // 管理員如果傳 0，就查上架中；傳 1，就查下架倉庫；如果不傳(null)，就代表全部都看！
+        if (isDeleted != null) {
+            sql.append("AND is_deleted = :isDeleted ");
+            map.put("isDeleted", isDeleted);
+        }
+
+        // 後台清單排序邏輯：最新修改或最新上架的商品排在最前面
+        sql.append("ORDER BY last_modified_date DESC, product_id DESC ");
+
+        // 分頁處理
+        sql.append("LIMIT :size OFFSET :offset ");
+        map.put("size", size);
+        map.put("offset", page * size);
+
+        return namedParameterJdbcOperations.query(sql.toString(), map, productRowMapper);
+    }
+
 
 }
