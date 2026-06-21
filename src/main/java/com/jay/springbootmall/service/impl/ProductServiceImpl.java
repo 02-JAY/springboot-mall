@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
     // 區塊 A：後台管理系統 (Back-Office / Admin CMS)
 
     /**
-     * 後台：上架/建立新商品
+     * 後台：建立新商品
      */
     @Transactional
     @Override
@@ -76,6 +76,11 @@ public class ProductServiceImpl implements ProductService {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("修改失敗：找不到該商品，ID: " + productId));
 
+        // 🛑 核心卡控：檢查商品是否已被軟刪除（下架）
+        if (existingProduct.getIsDeleted() == 1) {
+            throw new RuntimeException("修改失敗：該商品目前處於下架/刪除狀態，請先將其「恢復上架」後再進行資料修改。");
+        }
+        
         // 2. 僅覆蓋「允許被修改」的欄位，防止重要安全參數被前端惡意覆蓋
         existingProduct.setProductName(productRequestDTO.getProductName());
         existingProduct.setBrand(productRequestDTO.getBrand());
@@ -112,11 +117,14 @@ public class ProductServiceImpl implements ProductService {
         // 1. 檢查商品是否存在
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("刪除失敗：找不到該商品，ID: " + productId));
-
+        // 卡控：檢查是否已經是下架狀態
+        if (product.getIsDeleted() == 1) {
+            throw new RuntimeException("該商品目前已處於下架狀態，不需重複下架。");
+        }
         // 2. 不執行實體刪除，而是把狀態改為 1
         product.setIsDeleted(1);
 
-        // 3. 存回資料庫，這樣該商品在資料庫的 is_deleted 欄位就會變成 1,且樂觀鎖 version 會自動 +1
+        // 3. 存回資料庫，JPA 會動態比對欄位並發送 UPDATE，且樂觀鎖 version 會自動 +1
         productRepository.save(product);
     }
 
@@ -126,17 +134,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void restoreProductById(Integer productId) {
-        // 1. 1. 檢查商品是否存在
+        // 1. 檢查商品是否存在
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("恢復失敗：找不到該商品，ID: " + productId));
 
-        // 2. 檢查是否刪除？
+        // 卡控：檢查是否需要恢復
         if (product.getIsDeleted() == 0) {
             throw new RuntimeException("該商品目前處於正常上架狀態，不需恢復。");
         }
 
-        // 3. 改回 0，JPA 會在 Transaction 結束時自動寫回資料庫，且樂觀鎖 version 會自動 +1
+        // 2. 改回 0（重新上架）
         product.setIsDeleted(0);
+
+        // 3. 存回資料庫，觸發樂觀鎖控制與版本號更新
         productRepository.save(product);
     }
 
