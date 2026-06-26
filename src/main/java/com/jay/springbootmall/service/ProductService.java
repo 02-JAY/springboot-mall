@@ -37,7 +37,7 @@ public interface ProductService {
     /**
      * 後台：修改商品商務資訊
      * @param productId 要修改的商品 ID
-     * @param updateProductDTO 允許被前端覆蓋的修改欄位資料
+     * @param ProductRequestDTO 允許被前端覆蓋的修改欄位資料
      * @return 更新成功且樂觀鎖版本（version）遞增後的商品物件
      */
     Product updateProduct(Integer productId, ProductRequestDTO productRequestDTO);
@@ -83,7 +83,7 @@ public interface ProductService {
     /**
      * LINE Bot 專用：依據精煉後的關鍵字與分類進行智慧推薦
      */
-    List<Product> getBotRecommendations(String keyword, String category);
+    List<Product> getBotRecommendations(String keyword, ProductCategory category);
 
 
 }

@@ -11,7 +11,7 @@ public interface ProductDao {
                               Boolean isPromotion, Integer page, Integer size, String orderBy, String sort);
 
 
-    List<Product> getBotRecommendations(String keyword, String category);
+    List<Product> getBotRecommendations(String keyword, ProductCategory category);
 
     List<Product> getAllProductsForAdmin(Integer isDeleted, Integer page, Integer size);
 }

@@ -1,6 +1,7 @@
 package com.jay.springbootmall.controller;
 
 import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.model.ProductCategory;
 import com.jay.springbootmall.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,7 @@ public class ProductBotController {
             @RequestParam(required = false) String keyword,
 
             @Parameter(description = "AI 預測的商品分類（如：FRAGRANCE_PACK）", example = "FRAGRANCE_PACK")
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) ProductCategory category
     ) {
         // 呼叫 Service 執行推薦邏輯
         List<Product> recommendations = productService.getBotRecommendations(keyword, category);

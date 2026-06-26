@@ -99,7 +99,7 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> getBotRecommendations(String keyword, String category) {
+    public List<Product> getBotRecommendations(String keyword, ProductCategory category) {
         // 基礎 SQL：確保撈出所有必要欄位，且商品必須是「未刪除」的正常商品
         StringBuilder sql = new StringBuilder(
                 "SELECT product_id, product_name, brand, category, price, stock, " +
@@ -113,9 +113,9 @@ public class ProductDaoImpl implements ProductDao {
 
         // 🌟 動態條件拼接
         // 1. 如果 AI 有成功預測出精準的分類，直接鎖定分類查詢
-        if (category != null && !category.trim().isEmpty()) {
+        if (category != null ) {
             sql.append("AND category = :category ");
-            map.put("category", category.trim());
+            map.put("category", category.name());
         }
 
         // 2. 如果有核心關鍵字，進行多維度（品名、描述、JSON規格）模糊比對

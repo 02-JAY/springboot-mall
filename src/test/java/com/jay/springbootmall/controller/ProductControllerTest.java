@@ -1,4 +1,4 @@
-package com.jay.springbootmall;
+package com.jay.springbootmall.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jay.springbootmall.dao.ProductRepository;
@@ -85,10 +85,18 @@ public class ProductControllerTest {
         Product deletedProduct = new Product();
         deletedProduct.setProductName("絕版防潮袋");
         deletedProduct.setBrand("山水");
+
+        // 🎯 【關鍵修正】這裡一定要補上 category，不然資料庫會噴 Column 'category' cannot be null
+        deletedProduct.setCategory(ProductCategory.FRAGRANCE_PACK);
+
         deletedProduct.setPrice(500);
         deletedProduct.setStock(0);
         deletedProduct.setImageUrl("https://example.com/img2.png");
         deletedProduct.setIsDeleted(1); // 早已下架
+
+        // 💡 如果你的 Product Entity 還有其他 @Column(nullable = false) 的欄位（例如 isPromo），記得在這裡一併塞預設值：
+        // deletedProduct.setIsPromo(false);
+
         deletedProduct = productRepository.saveAndFlush(deletedProduct);
 
         // Act & Assert: 模擬發送 DELETE 請求
@@ -96,6 +104,4 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString("該商品目前已處於下架狀態")));
     }
-
-
 }

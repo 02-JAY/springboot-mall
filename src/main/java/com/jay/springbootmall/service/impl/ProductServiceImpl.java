@@ -2,6 +2,8 @@ package com.jay.springbootmall.service.impl;
 
 import com.jay.springbootmall.dao.ProductDao;
 import com.jay.springbootmall.dao.ProductRepository;
+import com.jay.springbootmall.exception.IllegalOperationException;
+import com.jay.springbootmall.exception.ResourceNotFoundException;
 import com.jay.springbootmall.model.Product;
 import com.jay.springbootmall.model.ProductCategory;
 import com.jay.springbootmall.model.ProductRequestDTO;
@@ -74,11 +76,13 @@ public class ProductServiceImpl implements ProductService {
         // 1. 先從資料庫查出帶有樂觀鎖版本（version）與建立時間的完整舊物件
         // 這裡必須用 productRepository (JPA) 查，才能讓這筆物件進入 JPA 的管理狀態，save 時才會動態比對 version 觸發樂觀鎖！
         Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("修改失敗：找不到該商品，ID: " + productId));
+                // 改用自定義的 ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("修改失敗：找不到該商品，ID: " + productId));
 
         // 🛑 核心卡控：檢查商品是否已被軟刪除（下架）
         if (existingProduct.getIsDeleted() == 1) {
-            throw new RuntimeException("修改失敗：該商品目前處於下架/刪除狀態，請先將其「恢復上架」後再進行資料修改。");
+            // 改用自定義的 IllegalOperationException
+            throw new IllegalOperationException("修改失敗：該商品目前處於下架/刪除狀態，請先將其「恢復上架」後再進行資料修改。");
         }
         
         // 2. 僅覆蓋「允許被修改」的欄位，防止重要安全參數被前端惡意覆蓋
@@ -116,10 +120,12 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProductById(Integer productId) {
         // 1. 檢查商品是否存在
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("刪除失敗：找不到該商品，ID: " + productId));
+                // 改用自定義的 ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("刪除失敗：找不到該商品，ID: " + productId));
         // 卡控：檢查是否已經是下架狀態
         if (product.getIsDeleted() == 1) {
-            throw new RuntimeException("該商品目前已處於下架狀態，不需重複下架。");
+            // 改用自定義的 IllegalOperationException
+            throw new IllegalOperationException("該商品目前已處於下架狀態，不需重複下架。");
         }
         // 2. 不執行實體刪除，而是把狀態改為 1
         product.setIsDeleted(1);
@@ -136,11 +142,13 @@ public class ProductServiceImpl implements ProductService {
     public void restoreProductById(Integer productId) {
         // 1. 檢查商品是否存在
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("恢復失敗：找不到該商品，ID: " + productId));
+                // 改用自定義的 ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("恢復失敗：找不到該商品，ID: " + productId));
 
         // 卡控：檢查是否需要恢復
         if (product.getIsDeleted() == 0) {
-            throw new RuntimeException("該商品目前處於正常上架狀態，不需恢復。");
+            // 改用自定義的 IllegalOperationException
+            throw new IllegalOperationException("該商品目前處於正常上架狀態，不需恢復。");
         }
 
         // 2. 改回 0（重新上架）
@@ -156,7 +164,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getProductByIdForAdmin(Integer productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("後台查詢失敗：找不到該商品，ID: " + productId));
+                // 改用自定義的 ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("後台查詢失敗：找不到該商品，ID: " + productId));
     }
 
     // 區塊 B：前台購物網站與外部檢索 (Client Portal / LINE Bot API)
@@ -168,7 +177,8 @@ public class ProductServiceImpl implements ProductService {
     public Product getProductByIdForClient(Integer productId) {
         // 傳入 0 代表 is_deleted = 0 (未刪除/上架中)
         return productRepository.findByProductIdAndIsDeleted(productId, 0)
-                .orElseThrow(() -> new RuntimeException("商品已下架或不存在，ID: " + productId));
+                // 改用字定義的 ResourceNotFoundException
+                .orElseThrow(() -> new ResourceNotFoundException("商品已下架或不存在，ID: " + productId));
     }
 
     /**
@@ -185,12 +195,12 @@ public class ProductServiceImpl implements ProductService {
      * LINE Bot 專用：依據精煉後的關鍵字與分類進行智慧推薦
      */
     @Override
-    public List<Product> getBotRecommendations(String keyword, String category) {
+    public List<Product> getBotRecommendations(String keyword, ProductCategory category) {
         // 為了容錯，如果兩者都沒傳，就給個空字串避免噴錯
         String validKeyword = (keyword != null) ? keyword.trim() : "";
-        String validCategory = (category != null) ? category.trim() : "";
 
-        // 業務邏輯：直接交給 DAO 進行多維度 SQL 檢索
-        return productDao.getBotRecommendations(validKeyword, validCategory);
+
+        // Enum 不需要 trim，直接傳入。如果外層傳 null 进来，就直接帶入 null 讓 SQL 去判斷（或在 DAO 處理）
+        return productDao.getBotRecommendations(validKeyword, category);
     }
 }
