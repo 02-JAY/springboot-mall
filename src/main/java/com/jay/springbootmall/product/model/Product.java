@@ -1,4 +1,4 @@
-package com.jay.springbootmall.model;
+package com.jay.springbootmall.product.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;

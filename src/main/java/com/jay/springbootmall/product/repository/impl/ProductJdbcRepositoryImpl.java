@@ -1,9 +1,9 @@
-package com.jay.springbootmall.dao.impl;
+package com.jay.springbootmall.product.repository.impl;
 
-import com.jay.springbootmall.dao.ProductDao;
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.rowmapper.ProductRowMapper;
+import com.jay.springbootmall.product.repository.ProductJdbcRepository;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
+import com.jay.springbootmall.product.repository.ProductRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
 
@@ -13,14 +13,14 @@ import java.util.Map;
 
 
 @Repository
-public class ProductDaoImpl implements ProductDao {
+public class ProductJdbcRepositoryImpl implements ProductJdbcRepository {
     // 1. 將所有依賴都宣告為 private final（不可變，更安全）
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
     private final ProductRowMapper productRowMapper;
 
     // 2. 統一用同一個建構子注入！連 @Autowired 都不用寫，Spring 會自動幫你把這兩個 Bean 塞進來
-    public ProductDaoImpl(NamedParameterJdbcOperations namedParameterJdbcOperations,
-                          ProductRowMapper productRowMapper) {
+    public ProductJdbcRepositoryImpl(NamedParameterJdbcOperations namedParameterJdbcOperations,
+                                     ProductRowMapper productRowMapper) {
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
         this.productRowMapper = productRowMapper;
     }

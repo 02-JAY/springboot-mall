@@ -1,9 +1,9 @@
-package com.jay.springbootmall.rowmapper;
+package com.jay.springbootmall.product.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

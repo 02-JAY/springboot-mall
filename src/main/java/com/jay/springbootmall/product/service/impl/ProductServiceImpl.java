@@ -1,13 +1,13 @@
-package com.jay.springbootmall.service.impl;
+package com.jay.springbootmall.product.service.impl;
 
-import com.jay.springbootmall.dao.ProductDao;
-import com.jay.springbootmall.dao.ProductRepository;
+import com.jay.springbootmall.product.repository.ProductJdbcRepository;
+import com.jay.springbootmall.product.repository.ProductRepository;
 import com.jay.springbootmall.exception.IllegalOperationException;
 import com.jay.springbootmall.exception.ResourceNotFoundException;
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.model.ProductRequestDTO;
-import com.jay.springbootmall.service.ProductService;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
+import com.jay.springbootmall.product.dto.ProductRequestDTO;
+import com.jay.springbootmall.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository; // 注入 JPA，專門搞定 Insert/Update 與搶購樂源鎖
 
     @Autowired
-    private ProductDao productDao; // 注入 JDBC，負責未來的複雜 SQL 與 LINE Bot 查詢
+    private ProductJdbcRepository productDao; // 注入 JDBC，負責未來的複雜 SQL 與 LINE Bot 查詢
 
     // 區塊 A：後台管理系統 (Back-Office / Admin CMS)
 

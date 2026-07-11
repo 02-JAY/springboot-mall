@@ -1,7 +1,6 @@
-package com.jay.springbootmall.model;
+package com.jay.springbootmall.member.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;

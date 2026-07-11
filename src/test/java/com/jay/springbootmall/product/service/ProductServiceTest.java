@@ -1,8 +1,9 @@
-package com.jay.springbootmall.service;
+package com.jay.springbootmall.product.service;
 
-import com.jay.springbootmall.dao.ProductRepository;
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
+import com.jay.springbootmall.product.repository.ProductRepository;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
+import com.jay.springbootmall.product.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

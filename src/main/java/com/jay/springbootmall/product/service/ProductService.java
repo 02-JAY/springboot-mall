@@ -1,8 +1,8 @@
-package com.jay.springbootmall.service;
+package com.jay.springbootmall.product.service;
 
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.model.ProductRequestDTO;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
+import com.jay.springbootmall.product.dto.ProductRequestDTO;
 
 import java.util.List;
 

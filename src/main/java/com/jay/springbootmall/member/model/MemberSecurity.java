@@ -1,4 +1,4 @@
-package com.jay.springbootmall.model;
+package com.jay.springbootmall.member.model;
 
 import jakarta.persistence.*;
 

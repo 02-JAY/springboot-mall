@@ -1,6 +1,6 @@
-package com.jay.springbootmall.dao;
+package com.jay.springbootmall.product.repository;
 
-import com.jay.springbootmall.model.Product;
+import com.jay.springbootmall.product.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

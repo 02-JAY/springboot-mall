@@ -1,4 +1,4 @@
-package com.jay.springbootmall.model;
+package com.jay.springbootmall.product.model;
 
 public enum ProductCategory {
     FRAGRANCE_PACK("香氛防潮包"),

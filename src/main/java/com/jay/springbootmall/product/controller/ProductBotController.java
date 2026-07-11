@@ -1,8 +1,8 @@
-package com.jay.springbootmall.controller;
+package com.jay.springbootmall.product.controller;
 
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.service.ProductService;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
+import com.jay.springbootmall.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

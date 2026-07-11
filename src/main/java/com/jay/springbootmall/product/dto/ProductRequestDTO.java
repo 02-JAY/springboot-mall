@@ -1,5 +1,6 @@
-package com.jay.springbootmall.model;
+package com.jay.springbootmall.product.dto;
 
+import com.jay.springbootmall.product.model.ProductCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

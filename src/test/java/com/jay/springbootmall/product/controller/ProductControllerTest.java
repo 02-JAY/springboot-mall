@@ -1,10 +1,10 @@
-package com.jay.springbootmall.controller;
+package com.jay.springbootmall.product.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jay.springbootmall.dao.ProductRepository;
-import com.jay.springbootmall.model.Product;
-import com.jay.springbootmall.model.ProductCategory;
-import com.jay.springbootmall.model.ProductRequestDTO;
+import com.jay.springbootmall.product.repository.ProductRepository;
+import com.jay.springbootmall.product.model.Product;
+import com.jay.springbootmall.product.model.ProductCategory;
+import com.jay.springbootmall.product.dto.ProductRequestDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
