@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Integer> {
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 用於一般 Email 登入或檢查重複註冊
     Optional<Member> findByEmail(String email);
