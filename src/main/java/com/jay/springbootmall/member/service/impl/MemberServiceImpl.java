@@ -2,6 +2,7 @@ package com.jay.springbootmall.member.service.impl;
 
 import com.jay.springbootmall.exception.IllegalOperationException;
 import com.jay.springbootmall.exception.ResourceNotFoundException;
+import com.jay.springbootmall.member.dto.LoginRequest;
 import com.jay.springbootmall.member.dto.MemberResponse;
 import com.jay.springbootmall.member.dto.RegisterRequest;
 import com.jay.springbootmall.member.model.Member;
@@ -142,6 +143,31 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
     }
 
+    @Override
+    @Transactional(readOnly = true) // 確保能 Lazily 載入關聯的 Security
+    public Member login(LoginRequest request) {
+        // 1. 根據 Email 查出會員 (此時會一併載入 roles，因為 roles 是 EAGER)
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("登入失敗：帳號或密碼錯誤"));
+
+        // 2. 檢查帳號啟用狀態
+        if (member.getStatus() != 1) {
+            throw new IllegalStateException("該帳號已被停用，請聯繫管理員");
+        }
+
+        // 3. 從 1:1 關聯的 Security 物件中取出密碼雜湊值進行 BCrypt 比對
+        MemberSecurity security = member.getSecurity();
+        if (security == null || security.getPasswordHash() == null) { // 假設密碼欄位叫 passwordHash
+            throw new IllegalArgumentException("登入失敗：帳號安全資料異常");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), security.getPasswordHash())) {
+            throw new IllegalArgumentException("登入失敗：帳號或密碼錯誤");
+        }
+
+        return member;
+    }
+
     private MemberResponse convertToResponse(Member member) {
         Set<String> roleNames = member.getRoles().stream()
                 .map(Role::getRoleName)
@@ -156,4 +182,5 @@ public class MemberServiceImpl implements MemberService {
                 roleNames
         );
     }
+
 }
