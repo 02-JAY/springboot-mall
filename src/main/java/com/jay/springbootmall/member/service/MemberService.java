@@ -13,6 +13,9 @@ public interface MemberService {
     MemberResponse getMemberById(Long id);
 
     // 【Update】綁定 LINE 帳號
+    MemberResponse processLineBinding(Long memberId, String code);
+
+    // 【Update】綁定 LINE 帳號
     MemberResponse bindLineUserId(Long memberId, String lineUserId);
 
     // 【Update】修改密碼

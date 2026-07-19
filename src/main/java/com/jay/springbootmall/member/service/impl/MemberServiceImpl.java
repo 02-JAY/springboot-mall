@@ -1,5 +1,7 @@
 package com.jay.springbootmall.member.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jay.springbootmall.exception.IllegalOperationException;
 import com.jay.springbootmall.exception.ResourceNotFoundException;
 import com.jay.springbootmall.member.dto.LoginRequest;
@@ -11,11 +13,20 @@ import com.jay.springbootmall.member.model.Role;
 import com.jay.springbootmall.member.repository.MemberRepository;
 import com.jay.springbootmall.member.repository.RoleRepository;
 import com.jay.springbootmall.member.service.MemberService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +37,16 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // ─── 核心修改 1：改由 application.properties 動態注入，上版不留機密 ───
+    @Value("${line.auth.client-id}")
+    private String lineClientId;
+
+    @Value("${line.auth.client-secret}")
+    private String lineClientSecret;
+
+    @Value("${line.auth.redirect-uri}")
+    private String lineRedirectUri;
 
     public MemberServiceImpl(MemberRepository memberRepository,
                              RoleRepository roleRepository,
@@ -78,6 +99,23 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("找不到該會員，ID: " + id));
         return convertToResponse(member);
+    }
+
+    /**
+     * 【Update】核心綁定邏輯：整合 LINE OAuth 流程
+     */
+    @Override
+    @Transactional
+    public MemberResponse processLineBinding(Long memberId, String code) {
+        // 1. 遠端請求 LINE 伺服器，利用臨時 code 交換真實的 lineUserId
+        String lineUserId = fetchLineUserIdFromLineServer(code);
+
+        if (lineUserId == null || lineUserId.trim().isEmpty()) {
+            throw new IllegalOperationException("無法從 LINE 伺服器取得用戶資訊，請重新登入授權");
+        }
+
+        // 2. 將得到的 lineUserId 傳入你原本寫好的安全校驗方法，完成寫入
+        return this.bindLineUserId(memberId, lineUserId);
     }
 
     /**
@@ -166,6 +204,54 @@ public class MemberServiceImpl implements MemberService {
         }
 
         return member;
+    }
+
+
+    /**
+     * 輔助私有方法：負責透過 RestTemplate 與 LINE 伺服器進行雙階段通訊
+     */
+    private String fetchLineUserIdFromLineServer(String code) {
+        RestTemplate restTemplate = new RestTemplate();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            // ─── 第一階段：發送 code 換取 Access Token ───
+            String tokenUrl = "https://api.line.me/oauth2/v2.1/token";
+
+            HttpHeaders tokenHeaders = new HttpHeaders();
+            tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> tokenBody = new LinkedMultiValueMap<>();
+            tokenBody.add("grant_type", "authorization_code");
+            tokenBody.add("code", code);
+            tokenBody.add("redirect_uri", lineRedirectUri);
+            tokenBody.add("client_id", lineClientId);
+            tokenBody.add("client_secret", lineClientSecret);
+
+            HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenBody, tokenHeaders);
+            ResponseEntity<String> tokenResponse = restTemplate.postForEntity(tokenUrl, tokenRequest, String.class);
+
+            // 解析 LINE 回傳的第一手 JSON
+            JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
+
+            // 由於授權範圍內含有 openid，回傳結果會自帶 id_token (一個 JWT 字串)
+            String idToken = tokenJson.get("id_token").asText();
+
+            // 解密 JWT 的中間段 (Payload)，直接取得 user id，不用再發送第二次 HTTP 請求
+            String[] jwtParts = idToken.split("\\.");
+            String payloadJson = new String(Base64.getUrlDecoder().decode(jwtParts[1]));
+
+            JsonNode payloadNode = objectMapper.readTree(payloadJson);
+            String lineUserId = payloadNode.get("sub").asText(); // "sub" 欄位即為 LINE userId
+
+            System.out.println("【一條龍自動化】成功解析出 LINE ID: " + lineUserId);
+            return lineUserId;
+
+        } catch (Exception e) {
+            System.err.println("向 LINE 伺服器請求 Token 並解析失敗: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private MemberResponse convertToResponse(Member member) {

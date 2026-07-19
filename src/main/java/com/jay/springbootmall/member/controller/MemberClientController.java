@@ -76,7 +76,7 @@ public class MemberClientController {
 
         // 2. 動態將該會員擁有的 Roles 轉為 String Set (例如：["ROLE_MEMBER", "ROLE_ADMIN"])
         Set<String> roles = member.getRoles().stream()
-                .map(role -> role.getRoleName()) // 假設你的 Role Entity 取得角色名稱的方法是 getName()，請根據實際欄位微調
+                .map(role -> role.getRoleName())
                 .collect(Collectors.toSet());
 
         // 3. 帶入該會員的「真實 ID」與「Email」產生 Token
@@ -86,6 +86,24 @@ public class MemberClientController {
         Map<String, Object> response = new HashMap<>();
         response.put("token", jwtToken);
         response.put("memberId", member.getId());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "LINE OAuth 回傳進入點 (Callback)", description = "接收 LINE 重新導向取得的臨時 code 與 state（內含 memberId），由後端自動向 LINE 換取真實 User ID 並完成綁定。")
+    @GetMapping("/callback") // 必須是 GET，且路徑與 LINE 後台設定完全一致
+    public ResponseEntity<MemberResponse> lineCallback(
+            @RequestParam String code,
+            @RequestParam String state) {
+
+        // 1. 從 state 參數中還原出你的商城會員 ID
+        // 註：如果你前端傳入的是純數字字串，這裡直接轉成 Long
+        Long memberId = Long.parseLong(state);
+
+        // 2. 呼叫你原本寫在 Service 的一條龍自動化邏輯
+        // Service 內部會動態讀取 application.properties 的 ClientID/Secret/Uri
+        // 去跟 LINE 換 Token -> 解析出 lineId -> 自動寫入該 memberId 的 MySQL 欄位
+        MemberResponse response = memberService.processLineBinding(memberId, code);
 
         return ResponseEntity.ok(response);
     }
