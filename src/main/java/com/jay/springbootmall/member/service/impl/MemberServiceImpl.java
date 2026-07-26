@@ -186,7 +186,7 @@ public class MemberServiceImpl implements MemberService {
     public Member login(LoginRequest request) {
         // 1. 根據 Email 查出會員 (此時會一併載入 roles，因為 roles 是 EAGER)
         Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("登入失敗：帳號或密碼錯誤"));
+                .orElseThrow(() -> new IllegalOperationException("登入失敗：帳號或密碼錯誤"));
 
         // 2. 檢查帳號啟用狀態
         if (member.getStatus() != 1) {
@@ -208,19 +208,27 @@ public class MemberServiceImpl implements MemberService {
 
 
     /**
-     * 輔助私有方法：負責透過 RestTemplate 與 LINE 伺服器進行雙階段通訊
+     * 遠端發送請求至 LINE 伺服器，利用授權碼 (authorization_code) 換取 Access Token 與 ID Token，
+     * 並解密 id_token 中的 Payload 取得用戶的唯一識別碼 (lineUserId)。
+     *
+     * @param code LINE OAuth 授權完成後回傳的臨時授權碼
+     * @return String LINE 用戶唯一識別碼 (sub / lineUserId)
+     * @throws IllegalOperationException 當與 LINE 伺服器通訊失敗、回傳格式不符或解析異常時拋出
      */
     private String fetchLineUserIdFromLineServer(String code) {
+        // 建立 HTTP 請求工具與 JSON 解析器
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            // ─── 第一階段：發送 code 換取 Access Token ───
+            // 1. 定義 LINE Token API 端點
             String tokenUrl = "https://api.line.me/oauth2/v2.1/token";
 
+            // 2. 設定 HTTP Header (LINE 規定必須為 application/x-www-form-urlencoded)
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+            // 3. 組裝 Request Body 參數 (包含授權類型、Code、Redirect URI 與憑證)
             MultiValueMap<String, String> tokenBody = new LinkedMultiValueMap<>();
             tokenBody.add("grant_type", "authorization_code");
             tokenBody.add("code", code);
@@ -228,29 +236,41 @@ public class MemberServiceImpl implements MemberService {
             tokenBody.add("client_id", lineClientId);
             tokenBody.add("client_secret", lineClientSecret);
 
+            // 4. 打包請求並發送 POST 至 LINE 伺服器
             HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenBody, tokenHeaders);
             ResponseEntity<String> tokenResponse = restTemplate.postForEntity(tokenUrl, tokenRequest, String.class);
 
-            // 解析 LINE 回傳的第一手 JSON
+            // 防護 A：檢查 HTTP 狀態碼是否為 20x 成功狀態，且 Body 有回應
+            if (!tokenResponse.getStatusCode().is2xxSuccessful() || tokenResponse.getBody() == null) {
+                throw new IllegalOperationException("向 LINE 驗證失敗，無法取得 Token");
+            }
+
+            // 5. 解析 LINE 回傳的 JSON 回應
             JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
+            JsonNode idTokenNode = tokenJson.get("id_token");
 
-            // 由於授權範圍內含有 openid，回傳結果會自帶 id_token (一個 JWT 字串)
-            String idToken = tokenJson.get("id_token").asText();
+            // 防護 B：確認是否有拿到 OpenID Connect 的 id_token (JWT 格式字串)
+            if (idTokenNode == null || idTokenNode.asText().isEmpty()) {
+                throw new IllegalOperationException("LINE 回傳資料異常，缺乏 id_token");
+            }
 
-            // 解密 JWT 的中間段 (Payload)，直接取得 user id，不用再發送第二次 HTTP 請求
-            String[] jwtParts = idToken.split("\\.");
+            // 6. 解開 JWT 結構 (JWT 由 Header.Payload.Signature 三段以點號分隔組成)
+            String[] jwtParts = idTokenNode.asText().split("\\.");
+            if (jwtParts.length < 2) {
+                throw new IllegalOperationException("LINE id_token 格式不正確");
+            }
+
+            // 7. Base64 解碼中間段 (Payload) 取得 JSON 字串
             String payloadJson = new String(Base64.getUrlDecoder().decode(jwtParts[1]));
-
             JsonNode payloadNode = objectMapper.readTree(payloadJson);
-            String lineUserId = payloadNode.get("sub").asText(); // "sub" 欄位即為 LINE userId
 
-            System.out.println("【一條龍自動化】成功解析出 LINE ID: " + lineUserId);
-            return lineUserId;
+            // 8. 取出 "sub" 欄位 (Subject，在 OpenID 規範中代表該用戶於 LINE 的唯一 ID)
+            return payloadNode.has("sub") ? payloadNode.get("sub").asText() : null;
 
         } catch (Exception e) {
-            System.err.println("向 LINE 伺服器請求 Token 並解析失敗: " + e.getMessage());
-            e.printStackTrace();
-            return null;
+            // 若過程中有任何連線、解析或轉型異常，統一包裝為業務例外拋出
+            // 建議專案引入 @Slf4j 後，加上：log.error("LINE OAuth 流程發生錯誤", e);
+            throw new IllegalOperationException("LINE 帳號授權失敗：" + e.getMessage());
         }
     }
 
