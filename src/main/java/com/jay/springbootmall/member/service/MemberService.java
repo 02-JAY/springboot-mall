@@ -26,4 +26,7 @@ public interface MemberService {
 
     // ：登入驗證方法，成功則回傳會員資料，失敗則拋出異常
     Member login(LoginRequest request);
+
+    // 透過 LINE User ID 查詢會員
+    MemberResponse getMemberByLineUserId(String lineUserId);
 }

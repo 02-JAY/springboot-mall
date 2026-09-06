@@ -107,4 +107,11 @@ public class MemberClientController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "透過 LINE ID 查詢會員資料", description = "提供內部 LINE Bot 根據使用者的 LINE User ID 查詢是否為商城已綁定會員。")
+    @GetMapping("/by-line-id")
+    public ResponseEntity<MemberResponse> getMemberByLineUserId(@RequestParam String lineUserId) {
+        MemberResponse response = memberService.getMemberByLineUserId(lineUserId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
