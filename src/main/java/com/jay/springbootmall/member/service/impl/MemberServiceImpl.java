@@ -274,6 +274,17 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    /**
+     * 【Read】透過 LINE User ID 查詢會員（供 LINE Bot 內部判定使用）
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public MemberResponse getMemberByLineUserId(String lineUserId) {
+        Member member = memberRepository.findByLineUserId(lineUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("尚未綁定商城會員，Line ID: " + lineUserId));
+        return convertToResponse(member);
+    }
+
     private MemberResponse convertToResponse(Member member) {
         Set<String> roleNames = member.getRoles().stream()
                 .map(Role::getRoleName)
